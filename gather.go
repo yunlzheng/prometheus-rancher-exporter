@@ -27,6 +27,7 @@ type Data struct {
 		Type           string `json:"type"`
 		AgentState     string `json:"agentState"`
 		AgentIPAddress string `json:"agentIpAddress"`
+		UUID           string `json:"uuid"`
 	} `json:"data"`
 }
 
@@ -57,7 +58,7 @@ func (e *Exporter) processMetrics(data *Data, endpoint string, hideSys bool, ch 
 
 		if endpoint == "hosts" {
 
-			if err := e.setHostMetrics(x.HostName, x.State, x.AgentState, x.AgentIPAddress); err != nil {
+			if err := e.setHostMetrics(x.HostName, x.State, x.AgentState, x.AgentIPAddress, x.UUID); err != nil {
 				log.Errorf("Error processing host metrics: %s", err)
 				log.Errorf("Attempt Failed to set %s, %s, [agent] %s ", x.HostName, x.State, x.AgentState)
 

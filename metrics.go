@@ -52,7 +52,7 @@ func addMetrics() map[string]*prometheus.GaugeVec {
 			Namespace: "rancher",
 			Name:      ("host_state"),
 			Help:      "State of defined host as reported by the Rancher API",
-		}, []string{"name", "state", "agentIP"})
+		}, []string{"name", "state", "agentIP", "uuid"})
 	gaugeVecs["hostAgentsState"] = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: "rancher",
@@ -130,13 +130,13 @@ func (e *Exporter) setStackMetrics(name string, state string, health string) err
 }
 
 // setHostMetrics - Logic to set the state of a system as a gauge metric
-func (e *Exporter) setHostMetrics(name string, state, agentState string, agentIPAddress string) error {
+func (e *Exporter) setHostMetrics(name string, state, agentState string, agentIPAddress string, uuid string) error {
 
 	for _, y := range hostStates {
 		if state == y {
-			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress}).Set(1)
+			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress, "uuid": uuid}).Set(1)
 		} else {
-			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress}).Set(0)
+			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress, "uuid": uuid}).Set(0)
 		}
 
 	}
