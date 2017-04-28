@@ -8,7 +8,7 @@ RUN addgroup exporter \
 
 COPY . /go/src/github.com/infinityworksltd/prometheus-rancher-exporter
 
-RUN apk --update add ca-certificates \
+RUN apk --update add ca-certificates jq curl\
  && apk --update add --virtual build-deps go git \
  && cd /go/src/github.com/infinityworksltd/prometheus-rancher-exporter \
  && GOPATH=/go go get \
