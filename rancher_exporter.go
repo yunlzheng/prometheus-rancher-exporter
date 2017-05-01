@@ -20,7 +20,7 @@ const (
 
 // Runtime variables, user controllable for targeting, authentication and filtering.
 var (
-	metadataServer = getEnv("RANCHER_METADATA", "http://rancher-metadata")
+	metadataServer = getEnv("RANCHER_METADATA", "http://169.254.169.250")
 	metricsPath    = getEnv("METRICS_PATH", "/metrics") // Path under which to expose metrics
 	listenAddress  = getEnv("LISTEN_ADDRESS", ":9173")  // Address on which to expose metrics
 	rancherURL     = os.Getenv("CATTLE_URL")            // URL of Rancher Server API e.g. http://192.168.0.1:8080/v2-beta
