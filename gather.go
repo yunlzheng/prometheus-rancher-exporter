@@ -164,7 +164,9 @@ func setEndpoint(rancherURL string, component string, apiVer string) string {
 
 	var endpoint string
 
-	if strings.Contains(component, "services") {
+	if strings.Contains(component, "projects") {
+		endpoint = (rancherURL + "/projects/")
+	} else if strings.Contains(component, "services") {
 		endpoint = (rancherURL + "/services/")
 	} else if strings.Contains(component, "hosts") {
 		endpoint = (rancherURL + "/hosts/")

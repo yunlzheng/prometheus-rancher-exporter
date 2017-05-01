@@ -44,7 +44,6 @@ var (
 
 func init() {
 	fmt.Println(metadataServer)
-
 }
 
 // getEnv - Allows us to supply a fallback option if nothing specified
@@ -89,6 +88,8 @@ func main() {
 	// Register a new Exporter
 	Exporter := newExporter(rancherURL, accessKey, secretKey, hideSys, environmentUUID, agentIP)
 
+	Exporter.info()
+
 	// Register Metrics from each of the endpoints
 	// This invokes the Collect method through the prometheus client libraries.
 	prometheus.MustRegister(Exporter)
@@ -107,4 +108,8 @@ func main() {
 	})
 	log.Printf("Starting Server on port %s and path %s", listenAddress, metricsPath)
 	log.Fatal(http.ListenAndServe(listenAddress, nil))
+}
+
+func (e *Exporter) info() {
+	log.Infof("Exporter Info {rancherUrl: %s, accesskey: %s, secretkey: %s, agentIp: %s, envUUID: %s}", e.rancherURL, e.accessKey, e.secretKey, e.agentIP, e.environmentUUID)
 }

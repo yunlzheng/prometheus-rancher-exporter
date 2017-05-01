@@ -24,7 +24,7 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	}
 }
 
-// CurrentEnvironmentId function, Get current environmentId by uuid from meta-data
+// CurrentEnvironmentID function, Get current environmentId by uuid from meta-data
 func (e *Exporter) CurrentEnvironmentID() string {
 	apiVer := getAPIVersion(e.rancherURL)
 	url := setEndpoint(e.rancherURL, "projects", apiVer)
@@ -54,7 +54,6 @@ func setEnvironmentsEndpoint(rancherURL string, component string, apiVer string)
 	} else if strings.Contains(component, "hosts") {
 		endpoint = (rancherURL + "/hosts/")
 	} else if strings.Contains(component, "stacks") {
-
 		if apiVer == "v1" {
 			endpoint = (rancherURL + "/environments/")
 		} else {
