@@ -71,7 +71,7 @@ func (e *Exporter) processMetrics(data *Data, endpoint string, hideSys bool, ch 
 			// Later used as a dimension in service metrics
 			stackRef = storeStackRef(x.ID, x.Name)
 
-			if err := e.setStackMetrics(x.Name, x.State, x.HealthState); err != nil {
+			if err := e.setStackMetrics(x.Name, x.State, x.HealthState, e.agentIP, e.environmentUUID); err != nil {
 				log.Errorf("Error processing stack metrics: %s", err)
 				log.Errorf("Attempt Failed to set %s, %s, %s ", x.Name, x.State, x.HealthState)
 				continue
@@ -91,13 +91,13 @@ func (e *Exporter) processMetrics(data *Data, endpoint string, hideSys bool, ch 
 				log.Warnf("Failed to obtain stack_name for %s from the API", x.Name)
 			}
 
-			if err := e.setServiceMetrics(x.Name, stackName, x.State, x.HealthState, x.Scale); err != nil {
+			if err := e.setServiceMetrics(x.Name, stackName, x.State, x.HealthState, x.Scale, e.agentIP, e.environmentUUID); err != nil {
 				log.Errorf("Error processing service metrics: %s", err)
 				log.Errorf("Attempt Failed to set %s, %s, %s, %s, %d", x.Name, stackName, x.State, x.HealthState, x.Scale)
 				continue
 			}
 
-			e.setServiceMetrics(x.Name, stackName, x.State, x.HealthState, x.Scale)
+			e.setServiceMetrics(x.Name, stackName, x.State, x.HealthState, x.Scale, e.agentIP, e.environmentUUID)
 		}
 
 	}

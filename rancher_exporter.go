@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -18,12 +20,13 @@ const (
 
 // Runtime variables, user controllable for targeting, authentication and filtering.
 var (
-	metricsPath   = getEnv("METRICS_PATH", "/metrics") // Path under which to expose metrics
-	listenAddress = getEnv("LISTEN_ADDRESS", ":9173")  // Address on which to expose metrics
-	rancherURL    = os.Getenv("CATTLE_URL")            // URL of Rancher Server API e.g. http://192.168.0.1:8080/v2-beta
-	accessKey     = os.Getenv("CATTLE_ACCESS_KEY")     // Optional - Access Key for Rancher API
-	secretKey     = os.Getenv("CATTLE_SECRET_KEY")     // Optional - Secret Key for Rancher API
-	logLevel      = getEnv("LOG_LEVEL", "info")        // Optional - Set the logging level
+	metadataServer = getEnv("RANCHER_METADATA", "http://rancher-metadata")
+	metricsPath    = getEnv("METRICS_PATH", "/metrics") // Path under which to expose metrics
+	listenAddress  = getEnv("LISTEN_ADDRESS", ":9173")  // Address on which to expose metrics
+	rancherURL     = os.Getenv("CATTLE_URL")            // URL of Rancher Server API e.g. http://192.168.0.1:8080/v2-beta
+	accessKey      = os.Getenv("CATTLE_ACCESS_KEY")     // Optional - Access Key for Rancher API
+	secretKey      = os.Getenv("CATTLE_SECRET_KEY")     // Optional - Secret Key for Rancher API
+	logLevel       = getEnv("LOG_LEVEL", "info")        // Optional - Set the logging level
 	//hideSys, _    = strconv.ParseBool(os.Getenv("HIDE_SYS")) // hideSys - Optional - Flag that indicates if the environment variable `HIDE_SYS` is set to a boolean true value
 	hideSys, _ = strconv.ParseBool(getEnv("HIDE_SYS", "true")) // hideSys - Optional - Flag that indicates if the environment variable `HIDE_SYS` is set to a boolean true value
 )
@@ -37,8 +40,12 @@ var (
 	healthStates  = []string{"healthy", "unhealthy"}
 	endpoints     = []string{"stacks", "services", "hosts"} // EndPoints the exporter will trawl
 	stackRef      = make(map[string]string)                 // Stores the StackID and StackName as a map, used to provide label dimensions to service metrics
-
 )
+
+func init() {
+	fmt.Println(metadataServer)
+
+}
 
 // getEnv - Allows us to supply a fallback option if nothing specified
 func getEnv(key, fallback string) string {
@@ -47,6 +54,16 @@ func getEnv(key, fallback string) string {
 		return fallback
 	}
 	return value
+}
+
+func getMetadata(key string, server string) (string, error) {
+	resp, err := http.Get(server + "/latest/self/host/" + key)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	data, _ := ioutil.ReadAll(resp.Body)
+	return string(data), nil
 }
 
 func main() {
@@ -63,11 +80,14 @@ func main() {
 	log.Info("Starting Prometheus Exporter for Rancher")
 	log.Info("Runtime Configuration in-use: URL of Rancher Server: ", rancherURL, " AccessKey: ", accessKey, "System Services hidden: ", hideSys)
 
+	environmentUUID, _ := getMetadata("uuid", metadataServer)
+	agentIP, _ := getMetadata("agent_ip", metadataServer)
+
 	// Register internal metrics used for tracking the exporter performance
 	measure.Init()
 
 	// Register a new Exporter
-	Exporter := newExporter(rancherURL, accessKey, secretKey, hideSys)
+	Exporter := newExporter(rancherURL, accessKey, secretKey, hideSys, environmentUUID, agentIP)
 
 	// Register Metrics from each of the endpoints
 	// This invokes the Collect method through the prometheus client libraries.
