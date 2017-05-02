@@ -1,8 +1,6 @@
 package main
 
 import (
-	"strings"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -22,46 +20,6 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	for _, m := range e.gaugeVecs {
 		m.Describe(ch)
 	}
-}
-
-// CurrentEnvironmentID function, Get current environmentId by uuid from meta-data
-func (e *Exporter) CurrentEnvironmentID() string {
-	apiVer := getAPIVersion(e.rancherURL)
-	url := setEndpoint(e.rancherURL, "projects", apiVer)
-	var data = new(Data)
-	err := getJSON(url, e.accessKey, e.secretKey, &data)
-	if err != nil {
-		log.Error("Error getting JSON from URL ", url)
-		return ""
-	}
-
-	for _, x := range data.Data {
-		if x.UUID == e.environmentUUID {
-			return x.ID
-		}
-	}
-
-	return ""
-}
-
-// setEndpoint - Determines the correct URL endpoint to use, gives us backwards compatibility
-func setEnvironmentsEndpoint(rancherURL string, component string, apiVer string) string {
-
-	var endpoint string
-
-	if strings.Contains(component, "services") {
-		endpoint = (rancherURL + "/services/")
-	} else if strings.Contains(component, "hosts") {
-		endpoint = (rancherURL + "/hosts/")
-	} else if strings.Contains(component, "stacks") {
-		if apiVer == "v1" {
-			endpoint = (rancherURL + "/environments/")
-		} else {
-			endpoint = (rancherURL + "/stacks/")
-		}
-	}
-
-	return endpoint
 }
 
 // Collect function, called on by Prometheus Client library

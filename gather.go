@@ -110,7 +110,7 @@ func (e *Exporter) gatherData(rancherURL string, accessKey string, secretKey str
 
 	// Check API version and return the correct URL path
 	apiVer := getAPIVersion(rancherURL)
-	url := setEndpoint(rancherURL, endpoint, apiVer)
+	url := setEndpoint(rancherURL, endpoint, apiVer, "")
 
 	// Create new data slice from Struct
 	var data = new(Data)
@@ -160,7 +160,7 @@ func getJSON(url string, accessKey string, secretKey string, target interface{})
 }
 
 // setEndpoint - Determines the correct URL endpoint to use, gives us backwards compatibility
-func setEndpoint(rancherURL string, component string, apiVer string) string {
+func setEndpoint(rancherURL string, component string, apiVer string, environmentID string) string {
 
 	var endpoint string
 
