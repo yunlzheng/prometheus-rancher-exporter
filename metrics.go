@@ -85,7 +85,7 @@ func checkMetric(endpoint string, baseType string) bool {
 // setServiceMetrics - Logic to set the state of a system as a gauge metric
 func (e *Exporter) setServiceMetrics(name string, stack string, state string, health string, scale int, agentIP string, uuid string) error {
 
-	e.gaugeVecs["servicesScale"].With(prometheus.Labels{"name": name, "stack_name": stack}).Set(float64(scale))
+	e.gaugeVecs["servicesScale"].With(prometheus.Labels{"name": name, "stack_name": stack, "agentIP": agentIP, "uuid": uuid}).Set(float64(scale))
 
 	for _, y := range healthStates {
 		if health == y {
