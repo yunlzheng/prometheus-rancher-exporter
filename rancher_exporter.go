@@ -79,7 +79,7 @@ func main() {
 	log.Info("Starting Prometheus Exporter for Rancher")
 	log.Info("Runtime Configuration in-use: URL of Rancher Server: ", rancherURL, " AccessKey: ", accessKey, "System Services hidden: ", hideSys)
 
-	environmentUUID, _ := getMetadata("uuid", metadataServer)
+	environmentUUID, _ := getMetadata("environment_uuid", metadataServer)
 	agentIP, _ := getMetadata("agent_ip", metadataServer)
 
 	// Register internal metrics used for tracking the exporter performance
