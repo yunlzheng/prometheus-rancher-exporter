@@ -58,7 +58,7 @@ func (e *Exporter) processMetrics(data *Data, endpoint string, hideSys bool, ch 
 
 		if endpoint == "hosts" {
 
-			if err := e.setHostMetrics(x.HostName, x.State, x.AgentState, x.AgentIPAddress, x.UUID); err != nil {
+			if err := e.setHostMetrics(x.HostName, x.State, x.AgentState, x.AgentIPAddress, e.environmentUUID); err != nil {
 				log.Errorf("Error processing host metrics: %s", err)
 				log.Errorf("Attempt Failed to set %s, %s, [agent] %s ", x.HostName, x.State, x.AgentState)
 
@@ -106,11 +106,11 @@ func (e *Exporter) processMetrics(data *Data, endpoint string, hideSys bool, ch 
 }
 
 // gatherData - Collects the data from thw API, invokes functions to transform that data into metrics
-func (e *Exporter) gatherData(rancherURL string, accessKey string, secretKey string, endpoint string, ch chan<- prometheus.Metric) (*Data, error) {
+func (e *Exporter) gatherData(rancherURL string, accessKey string, secretKey string, endpoint string, environmentID string, ch chan<- prometheus.Metric) (*Data, error) {
 
 	// Check API version and return the correct URL path
 	apiVer := getAPIVersion(rancherURL)
-	url := setEndpoint(rancherURL, endpoint, apiVer, "")
+	url := setEndpoint(rancherURL, endpoint, apiVer, environmentID)
 
 	// Create new data slice from Struct
 	var data = new(Data)
@@ -163,19 +163,25 @@ func getJSON(url string, accessKey string, secretKey string, target interface{})
 func setEndpoint(rancherURL string, component string, apiVer string, environmentID string) string {
 
 	var endpoint string
+	var baseEndpoint string
+
+	if len(environmentID) > 0 {
+		baseEndpoint = (rancherURL + "/projects/" + environmentID)
+	} else {
+		baseEndpoint = rancherURL
+	}
 
 	if strings.Contains(component, "projects") {
 		endpoint = (rancherURL + "/projects/")
 	} else if strings.Contains(component, "services") {
-		endpoint = (rancherURL + "/services/")
+		endpoint = (baseEndpoint + "/services/")
 	} else if strings.Contains(component, "hosts") {
-		endpoint = (rancherURL + "/hosts/")
+		endpoint = (baseEndpoint + "/hosts/")
 	} else if strings.Contains(component, "stacks") {
-
 		if apiVer == "v1" {
-			endpoint = (rancherURL + "/environments/")
+			endpoint = (baseEndpoint + "/environments/")
 		} else {
-			endpoint = (rancherURL + "/stacks/")
+			endpoint = (baseEndpoint + "/stacks/")
 		}
 	}
 

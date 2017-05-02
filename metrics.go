@@ -130,21 +130,21 @@ func (e *Exporter) setStackMetrics(name string, state string, health string, age
 }
 
 // setHostMetrics - Logic to set the state of a system as a gauge metric
-func (e *Exporter) setHostMetrics(name string, state, agentState string, agentIPAddress string, uuid string) error {
+func (e *Exporter) setHostMetrics(name string, state, agentState string, agentIP string, uuid string) error {
 
 	for _, y := range hostStates {
 		if state == y {
-			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress, "uuid": uuid}).Set(1)
+			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIP, "uuid": uuid}).Set(1)
 		} else {
-			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress, "uuid": uuid}).Set(0)
+			e.gaugeVecs["hostsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIP, "uuid": uuid}).Set(0)
 		}
 
 	}
 	for _, y := range agentStates {
 		if agentState == y {
-			e.gaugeVecs["hostAgentsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress, "uuid": uuid}).Set(1)
+			e.gaugeVecs["hostAgentsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIP, "uuid": uuid}).Set(1)
 		} else {
-			e.gaugeVecs["hostAgentsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIPAddress, "uuid": uuid}).Set(0)
+			e.gaugeVecs["hostAgentsState"].With(prometheus.Labels{"name": name, "state": y, "agentIP": agentIP, "uuid": uuid}).Set(0)
 		}
 
 	}

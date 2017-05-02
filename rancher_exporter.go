@@ -111,5 +111,5 @@ func main() {
 }
 
 func (e *Exporter) info() {
-	log.Infof("Exporter Info {rancherUrl: %s, accesskey: %s, secretkey: %s, agentIp: %s, envUUID: %s}", e.rancherURL, e.accessKey, e.secretKey, e.agentIP, e.environmentUUID)
+	log.Infof("Exporter Info {rancherUrl: %s, accesskey: %s, secretkey: %s, agentIp: %s, envUUID: %s, envID: %s}", e.rancherURL, e.accessKey, e.secretKey, e.agentIP, e.environmentUUID, e.environmentID)
 }
